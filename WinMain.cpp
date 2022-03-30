@@ -1,4 +1,17 @@
 #include <Windows.h>
+#include <wrl.h>
+
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_CLOSE:
+		PostQuitMessage( 69 );
+		break;
+	}
+	return DefWindowProc(hWnd, msg, wParam, lParam);
+}
 
 int CALLBACK WinMain(
 	HINSTANCE hInstance,
@@ -11,11 +24,13 @@ int CALLBACK WinMain(
 	WNDCLASSEXA wc = { 0 };
 	wc.cbSize = sizeof(wc);
 	wc.style = CS_OWNDC;
+
 	//Note that I had an issue here because I was calling DefWindowProc instead of 
 	//DefWindowProcA so my window title was displaying in Chinese. 
 	//This is because it defaults to W if (A and W are the options to define what 
 	//character set it being used where A is ANSI and W is UNICODE)
-	wc.lpfnWndProc = DefWindowProcA;
+
+	wc.lpfnWndProc = WndProc;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInstance;
@@ -39,15 +54,23 @@ int CALLBACK WinMain(
 	
 	//windows is all about the messages .. and windows
 	MSG msg;
+	BOOL gResult;
 
 	//Keep polling for a message, and if we receive one then translate it 
-	while (GetMessageA(&msg, nullptr, 0, 0) > 0)
+	while ((gResult = GetMessageA(&msg, nullptr, 0, 0)) > 0)
 	{
 		//Message must be translated for in order for Dispatch to be able to understand it.
 
 		TranslateMessage(&msg);
 		DispatchMessageA(&msg);
 	}
-	while (true);
-	return 0;
+
+	if (gResult == -1)
+	{
+		return -1;
+	}
+	else
+	{
+		return msg.wParam;
+	}
 }
