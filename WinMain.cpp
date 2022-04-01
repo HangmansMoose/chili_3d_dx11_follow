@@ -1,15 +1,26 @@
-#include <Windows.h>
-#include <wrl.h>
+#include "ChiliWin.h"
+#include <string>
+
 
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	
 	switch (msg)
 	{
 	case WM_CLOSE:
 		PostQuitMessage( 69 );
 		break;
+		//WM_CHAR is a message about text input .. duh
+		//Though, what might not be as obvious is that it also has a notion
+		//of whether something is a capital letter (ie shift key pressed)
+	case WM_CHAR:
+		static std::string title;
+		title.push_back( (char)wParam );
+		SetWindowTextA(hWnd, title.c_str() );
+		break;
 	}
+
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
