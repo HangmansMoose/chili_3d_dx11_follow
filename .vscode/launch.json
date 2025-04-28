@@ -1,0 +1,26 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Launch",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/x64/debug/Chili_Direct3d.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        //{
+        //    "name": "Release Launch",
+        //    "type": "cppvsdbg",
+        //    "request": "launch",
+        //    "program": "${workspaceFolder}/x64/release/Chili_Direct3d.exe",
+        //    "args": [],
+        //    "cwd": "${workspaceFolder}",
+        //    "console": "integratedTerminal"
+        //}
+    ]
+}
