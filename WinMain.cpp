@@ -1,87 +1,64 @@
-#include "ChiliWin.h"
-#include <string>
+/*****************************************************************************************
+*	Chili Direct3D Engine																  *
+*	Copyright 2018 PlanetChili <http://www.planetchili.net>								  *
+*																						  *
+*	This file is part of Chili Direct3D Engine.											  *
+*																						  *
+*	Chili Direct3D Engine is free software: you can redistribute it and/or modify		  *
+*	it under the terms of the GNU General Public License as published by				  *
+*	the Free Software Foundation, either version 3 of the License, or					  *
+*	(at your option) any later version.													  *
+*																						  *
+*	The Chili Direct3D Engine is distributed in the hope that it will be useful,		  *
+*	but WITHOUT ANY WARRANTY; without even the implied warranty of						  *
+*	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the						  *
+*	GNU General Public License for more details.										  *
+*																						  *
+*	You should have received a copy of the GNU General Public License					  *
+*	along with The Chili Direct3D Engine.  If not, see <http://www.gnu.org/licenses/>.    *
+******************************************************************************************/
+#include "Window.h"
 
-
-
-LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	
-	switch (msg)
-	{
-	case WM_CLOSE:
-		PostQuitMessage( 69 );
-		break;
-		//WM_CHAR is a message about text input .. duh
-		//Though, what might not be as obvious is that it also has a notion
-		//of whether something is a capital letter (ie shift key pressed)
-	case WM_CHAR:
-		static std::string title;
-		title.push_back( (char)wParam );
-		SetWindowTextA(hWnd, title.c_str() );
-		break;
-	}
-
-	return DefWindowProc(hWnd, msg, wParam, lParam);
-}
 
 int CALLBACK WinMain(
 	HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
 	LPSTR     lpCmdLine,
-	int       nCmdShow)
+	int       nCmdShow )
 {
-	const auto pClassName = LPCSTR("hw3dbutts");
-	// register window class (all these are found in MSDN if need be)
-	WNDCLASSEXA wc = { 0 };
-	wc.cbSize = sizeof(wc);
-	wc.style = CS_OWNDC;
-
-	//Note that I had an issue here because I was calling DefWindowProc instead of 
-	//DefWindowProcA so my window title was displaying in Chinese. 
-	//This is because it defaults to W if (A and W are the options to define what 
-	//character set it being used where A is ANSI and W is UNICODE)
-
-	wc.lpfnWndProc = WndProc;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
-	wc.hInstance = hInstance;
-	wc.hIcon = nullptr;
-	wc.hCursor = nullptr;
-	wc.hbrBackground = nullptr;
-	wc.lpszMenuName = nullptr;
-	wc.lpszClassName = pClassName;
-	wc.hIconSm = nullptr;
-	RegisterClassExA(&wc);
-	// create window instance
-	HWND hWnd = CreateWindowExA(
-		0, pClassName,
-		LPCSTR("Happy Hard Window"),
-		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
-		200, 200, 640, 480,
-		nullptr, nullptr, hInstance, nullptr
-	);
-	// show the damn window
-	ShowWindow(hWnd, SW_SHOW);
-	
-	//windows is all about the messages .. and windows
-	MSG msg;
-	BOOL gResult;
-
-	//Keep polling for a message, and if we receive one then translate it 
-	while ((gResult = GetMessageA(&msg, nullptr, 0, 0)) > 0)
+	try
 	{
-		//Message must be translated for in order for Dispatch to be able to understand it.
+		Window wnd( 800,300,"Donkey Fart Box" );
 
-		TranslateMessage(&msg);
-		DispatchMessageA(&msg);
-	}
+		MSG msg;
+		BOOL gResult;
+		while( (gResult = GetMessage( &msg,nullptr,0,0 )) > 0 )
+		{
+			// TranslateMessage will post auxilliary WM_CHAR messages from key msgs
+			TranslateMessage( &msg );
+			DispatchMessage( &msg );
+		}
 
-	if (gResult == -1)
-	{
-		return -1;
-	}
-	else
-	{
+		// check if GetMessage call itself borked
+		if( gResult == -1 )
+		{
+			throw CHWND_LAST_EXCEPT();
+		}
+
+		// wParam here is the value passed to PostQuitMessage
 		return msg.wParam;
 	}
+	catch( const ChiliException& e )
+	{
+		MessageBox( nullptr,e.what(),e.GetType(),MB_OK | MB_ICONEXCLAMATION );
+	}
+	catch( const std::exception& e )
+	{
+		MessageBox( nullptr,e.what(),"Standard Exception",MB_OK | MB_ICONEXCLAMATION );
+	}
+	catch( ... )
+	{
+		MessageBox( nullptr,"No details available","Unknown Exception",MB_OK | MB_ICONEXCLAMATION );
+	}
+	return -1;
 }
